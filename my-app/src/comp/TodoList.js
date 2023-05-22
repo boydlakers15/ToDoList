@@ -8,12 +8,7 @@ const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
   const [newDate, setNewDate] = useState("");
-
-  useEffect(() => {
-    fetchTodos();
-  }, []);
-
-  // Fetch all todos from the API
+  const [toggledTodos, setToggledTodos] = useState(false);
   const fetchTodos = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/alltodos');
@@ -23,25 +18,46 @@ const TodoList = () => {
     }
   };
 
+  useEffect(() => {
+    fetchTodos();
+  }, [todos]);
+
+ 
+
   // Add a new task to the API and update the local state
-  const addTodo = async (event) => {
+  // ...
+
+// Add item to todo list
+const addTodo = (event) => {
     event.preventDefault();
     if (newTodo.trim() !== "") {
       const todo = {
         task: newTodo,
+        done: false,
         date_added: newDate,
       };
-      try {
-        const response = await axios.post('http://localhost:5001/api/newtask', todo);
-        const insertedTask = response.data.insertedTask;
-        setTodos([...todos, insertedTask]);
-        setNewTodo("");
-        setNewDate("");
-      } catch (error) {
-        console.error('Error adding new task:', error);
-      }
+  
+      // Update the state immediately
+      setTodos([...todos, todo]);
+  
+      axios
+        .post("http://localhost:5001/api/newtask", todo)
+        .then((response) => {
+          console.log("To do created", response.data);
+          // Update the state with the inserted task
+          setTodos([...todos, response.data.insertedTask]);
+        })
+        .catch((error) => {
+          console.error("Error creating todo:", error);
+        });
+  
+      setNewTodo("");
+      setNewDate("");
     }
   };
+  
+  // ...
+  
 
   // Delete a task from the API and update the local state
   const deleteTodo = async (id) => {
@@ -74,16 +90,17 @@ const TodoList = () => {
     }
   };
 
-  // Toggle the done status of a task
-  const toggleDone = (id) => {
-    const updatedTodos = todos.map(todo => {
-      if (todo.id === id) {
-        return { ...todo, done: !todo.done };
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
-  };
+    // Toggle the done status of a task
+    const toggleDone = (id) => {
+        const updatedTodos = todos.map(todo => {
+          if (todo.id === id) {
+            return { ...todo, done: !todo.done };
+          }
+          return todo;
+        });
+        // setTodos(updatedTodos);
+        setToggledTodos(updatedTodos);
+      };
 
   return (
     <div className='TodoWrapper'>
@@ -112,17 +129,17 @@ const TodoList = () => {
       </button>
     </form>
     <ul className="todo-list">
-        {todos.map((todo) => (
-          <li key={todo.id} className='Todo'>
-            <input
-              type="checkbox"
-              checked={todo.done}
-              onChange={() => toggleDone(todo.id)}
-            />
-            <span style={{ textDecoration: todo.done ? "line-through" : "" }}>
-              {todo.task}
+    {todos.map((todo) => (
+        <li key={todo.id} className='Todo'>
+          <input
+            type="checkbox"
+            checked={todo.done}
+            onChange={() => toggleDone(todo.id)}
+          />
+          <span style={{ textDecoration: todo.done ? "line-through" : "" }}>
+            {todo.task}
             </span>
-            <span>{todo.date_added}</span>
+            <span>{new Date(todo.date_added).toLocaleDateString()}</span>
             <div className="buttons-container">
               <button
                 className='todo-delete'
