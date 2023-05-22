@@ -9,16 +9,18 @@ const TodoList = () => {
   const [newTodo, setNewTodo] = useState("");
   const [newDate, setNewDate] = useState("");
   const [toggledTodos, setToggledTodos] = useState(false);
-  const fetchTodos = async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/api/alltodos');
-      setTodos(response.data);
-    } catch (error) {
-      console.error('Error fetching todos:', error);
-    }
-  };
 
+  
   useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/alltodos');
+        setTodos(response.data);
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+      }
+    };
+  
     fetchTodos();
   }, [todos]);
 
