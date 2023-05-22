@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpPage = ({ setIsLoggedIn }) => {
   const [formState, setFormState] = useState({
@@ -13,8 +13,32 @@ const SignUpPage = ({ setIsLoggedIn }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const handleSignup = async () => {
-   
-    
+    try {
+      const response = await axios.post(
+        "https://pokemon-backend.herokuapp.com/users",
+        JSON.stringify({
+          firstName: formState.firstName,
+          lastName: formState.lastName,
+          email: formState.email,
+          username: formState.username,
+          password: formState.password,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setIsLoggedIn(true);
+      navigate('/home');
+    } catch (error) {
+      console.log(error);
+      if (error.response && error.response.data) {
+        setError(error.response.data);
+      } else {
+        setError("Failed to create user");
+      }
+    }
   };
 
   const handleInputChange = (event) => {
@@ -67,9 +91,6 @@ const SignUpPage = ({ setIsLoggedIn }) => {
         <button title="Signup">Sign Up</button>
       </form>
       {error && <p>{error}</p>}
-      <div className="signup-link">
-          Already have an account? <Link to="/ToDoList">Login</Link>
-        </div>
     </div>
   );
 };
