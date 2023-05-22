@@ -8,23 +8,23 @@ import axios from 'axios';
 import { useState, useEffect } from "react";
 
 function App() {
-  const [todos, setTodos] = useState([])
-  useEffect(() => {
-    // Fetch todos from the server
-    fetchTodos();
-  }, []);
+//   const [todos, setTodos] = useState([])
+//   useEffect(() => {
+//     // Fetch todos from the server
+//     fetchTodos();
+//   }, []);
   
-  const fetchTodos = async () => {
-      try {
-      const response = await axios.get("http://localhost:5001/api/alltodos");
-      console.log("db:", response.data)
-      setTodos(response.data);
-    } catch (error) {
-        console.error("Error fetching todos:", error);
-    }
-};
+//   const fetchTodos = async () => {
+//       try {
+//       const response = await axios.get("http://localhost:5001/api/alltodos");
+//       console.log("db:", response.data)
+//       setTodos(response.data);
+//     } catch (error) {
+//         console.error("Error fetching todos:", error);
+//     }
+// };
 
-console.log("todos:", todos)
+// console.log("todos:", todos)
   
   return (
     <Router>

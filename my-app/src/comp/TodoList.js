@@ -3,62 +3,46 @@ import React, { useState, useEffect } from "react";
 import Navbar from './NavBar';
 import axios from 'axios';
 
-//component
+// Component
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
   const [newDate, setNewDate] = useState("");
 
   useEffect(() => {
-    // Fetch todos from the server
     fetchTodos();
   }, []);
-  
+
+  // Fetch all todos from the API
   const fetchTodos = async () => {
-      try {
-      const response = await axios.get("http://localhost:5001/api/alltodos");
-      console.log("db:", response.data)
+    try {
+      const response = await axios.get('http://localhost:5001/api/alltodos');
       setTodos(response.data);
     } catch (error) {
-        console.error("Error fetching todos:", error);
-    }
-};
-
-
-
-  //add item to local storage when added to to-do list
-//   useEffect(() => {//http://localhost:5001/api/alltodos
-//     localStorage.setItem("todos", JSON.stringify(todos));
-//   }, [todos]);
-
-   /*add item to to-do list*/
-  const addTodo = (event) => {
-    event.preventDefault();
-    if (newTodo.trim() !== "") {
-      const todo = {
-        title: newTodo,
-        done: false,
-        date: newDate,
-      };
-
-      const addtodo = {
-        task: newTodo,
-        date_added: Date.now(),
-      };
-      setTodos([...todos, todo]);
-      console.log("new task:", newTodo)
-
-      axios.post('http://localhost:5001/api/newtask', addtodo)
-      .then((response) => {
-        console.log('To do created', response.data)
-      })
-
-      setNewTodo("");
-      setNewDate("");
+      console.error('Error fetching todos:', error);
     }
   };
 
-   
+  // Add a new task to the API and update the local state
+  const addTodo = async (event) => {
+    event.preventDefault();
+    if (newTodo.trim() !== "") {
+      const todo = {
+        task: newTodo,
+        date_added: newDate,
+      };
+      try {
+        const response = await axios.post('http://localhost:5001/api/newtask', todo);
+        const insertedTask = response.data.insertedTask;
+        setTodos([...todos, insertedTask]);
+        setNewTodo("");
+        setNewDate("");
+      } catch (error) {
+        console.error('Error adding new task:', error);
+      }
+    }
+  };
+
   // Delete a task from the API and update the local state
   const deleteTodo = async (id) => {
     try {
@@ -128,42 +112,42 @@ const TodoList = () => {
       </button>
     </form>
     <ul className="todo-list">
-      {todos.map((todo) => (
-        <li key={todo.id} className='Todo'>
-          <input
-            type="checkbox"
-            checked={todo.done}
-            onChange={() => toggleDone(todo.id)}
-          />
-          <span style={{ textDecoration: todo.done ? "line-through" : "" }}>
-            {todo.task}
-          </span>
-          <span>{todo.date_added}</span>
-          <div className="buttons-container">
-            <button
-              className='todo-delete'
-              onClick={() => deleteTodo(todo.id)}
-            >
-              Delete
-            </button>
-            <button
-              className='todo-edit'
-              onClick={() => {
-                const newTask = prompt("Enter new task:", todo.task);
-                const newDateAdded = prompt("Enter new date added:", todo.date_added);
-                if (newTask !== null) {
-                  editTodo(todo.id, newTask, newDateAdded);
-                }
-              }}
-            >
-              Edit
-            </button>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+        {todos.map((todo) => (
+          <li key={todo.id} className='Todo'>
+            <input
+              type="checkbox"
+              checked={todo.done}
+              onChange={() => toggleDone(todo.id)}
+            />
+            <span style={{ textDecoration: todo.done ? "line-through" : "" }}>
+              {todo.task}
+            </span>
+            <span>{todo.date_added}</span>
+            <div className="buttons-container">
+              <button
+                className='todo-delete'
+                onClick={() => deleteTodo(todo.id)}
+              >
+                Delete
+              </button>
+              <button
+                className='todo-edit'
+                onClick={() => {
+                  const newTask = prompt("Enter new task:", todo.task);
+                  const newDateAdded = prompt("Enter new date added:", todo.date_added);
+                  if (newTask !== null) {
+                    editTodo(todo.id, newTask, newDateAdded);
+                  }
+                }}
+              >
+                Edit
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default TodoList;
