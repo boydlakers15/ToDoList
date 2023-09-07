@@ -15,7 +15,7 @@ const SignUpPage = ({ setIsLoggedIn }) => {
   const handleSignup = async () => {
     try {
       const response = await axios.post(
-        "https://pokemon-backend.herokuapp.com/users",
+        "https://todo-backend-6vck.onrender.com",
         JSON.stringify({
           firstName: formState.firstName,
           lastName: formState.lastName,
